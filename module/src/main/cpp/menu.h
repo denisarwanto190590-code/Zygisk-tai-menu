@@ -45,14 +45,14 @@ void DrawESP()
         // Lempar koordinat 3D tadi ke fungsi kamera game (UGCAPIWorldToScreenPoint)
         old_WorldToScreenPoint(main_camera, enemyWorldPos, 2, &enemyScreenPos);
 
-        // Cek jika musuh berada di depan sudut pandang kamera (Z > 0)
-        if (enemyScreenPos.z > 0.0f) {
+        // PERBAIKAN: Mengubah koordinat .z .x .y menjadi huruf KAPITAL (.Z .X .Y)
+        if (enemyScreenPos.Z > 0.0f) {
             
             // Tentukan titik awal garis: Tepat di tengah bawah layar HP Anda
             ImVec2 line_start = ImVec2(screen_width / 2.0f, screen_height);
 
             // Tentukan titik akhir garis: Tepat di titik koordinat hasil konversi kamera tadi
-            ImVec2 line_end = ImVec2(enemyScreenPos.x, enemyScreenPos.y);
+            ImVec2 line_end = ImVec2(enemyScreenPos.X, enemyScreenPos.Y);
 
             // EKSEKUSI GAMBAR GARIS ESP KE LAYAR HP!
             GetForegroundDrawList()->AddLine(
@@ -110,9 +110,8 @@ void SetupImgui() {
     io.Fonts->AddFontFromMemoryTTF(Roboto_Regular, 30, 30.0f);
 }
 
-// Catatan: Jika terjadi redefinition error pada baris ini setelah dicompile, 
-// hapus atau beri tanda komentar (//) pada baris deklarasi di bawah ini.
-EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surface);
+// Deklarasi fungsi ditarik dari hook.cpp menggunakan extern agar tidak duplikat
+extern EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surface);
 
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     eglQuerySurface(dpy, surface, EGL_WIDTH, &glWidth);
@@ -139,7 +138,6 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
-    // PERBAIKAN: Memisahkan pemanggilan fungsi bertipe void dengan nilai return EGLBoolean
     old_eglSwapBuffers(dpy, surface);
     return 1; 
 }
