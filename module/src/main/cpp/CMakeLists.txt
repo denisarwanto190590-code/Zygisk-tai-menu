@@ -27,9 +27,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS} ${CXX_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
+# --- PERBAIKAN: Mendaftarkan seluruh jalur folder include secara detail agar compiler tidak buta ---
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(src/main/cpp)
 include_directories(KittyMemory)
 include_directories(Include)
 include_directories(Includes)
+include_directories(Includes/Dobby) # Membuka akses langsung ke dobby.h
 include_directories(ImGui)
 include_directories(ImGui/backends)
 
