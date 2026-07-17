@@ -43,7 +43,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
         return 0;
     const char *app_data_dir = env->GetStringUTFChars(appDataDir, nullptr);
     int user = 0;
-    // FIX: Ukuran penampung nama paket dikembalikan ke ukuran normal (256)
+    // PERBAIKAN TOTAL: Menggunakan array char[256] agar sscanf berfungsi normal
     static char package_name[256];
     if (sscanf(app_data_dir, "/data/%*[^/]/%d/%s", &user, package_name) != 2) {
         if (sscanf(app_data_dir, "/data/%*[^/]/%s", package_name) != 1) {
