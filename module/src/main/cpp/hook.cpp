@@ -30,7 +30,7 @@
 #include "Rect.h"
 #include <limits>
 
-#define GamePackageName "com.dts.freefireth" // Sudah disesuaikan ke Free Fire
+#define GamePackageName "com.dts.freefireth" 
 
 int glHeight, glWidth;
 char* game_data_dir = nullptr;
@@ -65,8 +65,8 @@ int isGame(JNIEnv *env, jstring appDataDir)
 
 bool setupimg;
 
-// --- SINKRONISASI TIPE DATA DENGAN MENU.H (MENGGUNAKAN EGLBoolean) ---
-EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
+// --- PERBAIKAN: Deklarasi pointer langsung mengambil extern milik menu.h agar tidak duplikat ---
+extern EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf); 
 
 // --- HOOK INPUT SENTUH ---
@@ -87,7 +87,6 @@ int32_t myConsume(void *thiz, void *arg1, bool arg2, long arg3, uint32_t *arg4, 
     return result;
 }
 
-// Dependensi project diletakkan di bawah inisialisasi agar macro compiler berjalan lancar
 #include "functions.h"
 #include "menu.h"
 
