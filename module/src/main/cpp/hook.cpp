@@ -65,9 +65,9 @@ int isGame(JNIEnv *env, jstring appDataDir)
 
 bool setupimg;
 
-// --- POINTER EGL SWAPBUFFERS BAWAAN TEMPLATE ---
-void (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
-void hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf); // Deklarasi fungsi dari menu.h
+// --- SINKRONISASI TIPE DATA DENGAN MENU.H (MENGGUNAKAN EGLBoolean) ---
+EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
+EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf); 
 
 // --- HOOK INPUT SENTUH ---
 void (*origInput)(void *thiz, void *ex_ab, void *ex_ac);
@@ -87,6 +87,7 @@ int32_t myConsume(void *thiz, void *arg1, bool arg2, long arg3, uint32_t *arg4, 
     return result;
 }
 
+// Dependensi project diletakkan di bawah inisialisasi agar macro compiler berjalan lancar
 #include "functions.h"
 #include "menu.h"
 
