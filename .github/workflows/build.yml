@@ -24,6 +24,11 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Install Android NDK & CMake Lama
+      run: |
+        sdkmanager --install "ndk;25.1.8937393" "cmake;3.22.1"
+        echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
+
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
