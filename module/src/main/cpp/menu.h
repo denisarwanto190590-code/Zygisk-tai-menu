@@ -5,10 +5,14 @@
 #ifndef ZYGISK_MENU_TEMPLATE_MENU_H
 #define ZYGISK_MENU_TEMPLATE_MENU_H
 
+#include <vector>
+#include <mutex>
+#include "functions.h" // Menarik struktur Vector3 dan extern dari functions.h
+
 using namespace ImGui;
 
 // --- CHECKBOX UNTUK TOMBOL ON/OFF ESP ---
-bool enable_esp_line = false;
+inline bool enable_esp_line = false; // Menggunakan inline agar tidak memicu redefinition error
 
 // --- LOGIKA UTAMA GAMBAR ESP LINE ---
 void DrawESP()
@@ -26,14 +30,13 @@ void DrawESP()
     for (void* player : active_players) {
         if (player == nullptr) continue;
 
-        // [FILTER 1 - SS PERTAMA ANDA] Cek apakah ini diri kita sendiri (Local Player)
-        // Kita intip memori pada alamat instance pemain + offset field 0xF8
+        // [FILTER 1] Cek apakah ini diri kita sendiri (Local Player) menggunakan field offset 0xF8 Anda
         bool is_local = *(bool*)((uintptr_t)player + 0xF8);
 
         // Jika bernilai true (1), berarti ini karakter Anda sendiri. Lompati/Jangan digambar!
         if (is_local) continue;
 
-        // Ambil koordinat 3D musuh menggunakan fungsi asli get_Position yang sudah kita ikat
+        // Ambil koordinat 3D musuh menggunakan fungsi asli get_Position
         Vector3 enemyWorldPos = old_GetPosition(player);
 
         // Wadah kosong untuk menampung hasil konversi koordinat ke layar 2D HP
