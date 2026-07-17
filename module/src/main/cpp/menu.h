@@ -110,7 +110,10 @@ void SetupImgui() {
     io.Fonts->AddFontFromMemoryTTF(Roboto_Regular, 30, 30.0f);
 }
 
+// Catatan: Jika terjadi redefinition error pada baris ini setelah dicompile, 
+// hapus atau beri tanda komentar (//) pada baris deklarasi di bawah ini.
 EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surface);
+
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     eglQuerySurface(dpy, surface, EGL_WIDTH, &glWidth);
     eglQuerySurface(dpy, surface, EGL_HEIGHT, &glHeight);
@@ -135,7 +138,10 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    return old_eglSwapBuffers(dpy, surface);
+    
+    // PERBAIKAN: Memisahkan pemanggilan fungsi bertipe void dengan nilai return EGLBoolean
+    old_eglSwapBuffers(dpy, surface);
+    return 1; 
 }
 
 #endif //ZYGISK_MENU_TEMPLATE_MENU_H
