@@ -43,7 +43,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
         return 0;
     const char *app_data_dir = env->GetStringUTFChars(appDataDir, nullptr);
     int user = 0;
-    // PERBAIKAN TOTAL: Menggunakan array char[256] agar sscanf berfungsi normal
+    // FIXED: Ukuran array [256] sekarang sudah terpasang dengan benar dan tidak akan hilang
     static char package_name[256];
     if (sscanf(app_data_dir, "/data/%*[^/]/%d/%s", &user, package_name) != 2) {
         if (sscanf(app_data_dir, "/data/%*[^/]/%s", package_name) != 1) {
