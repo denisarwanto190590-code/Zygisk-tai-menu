@@ -6,22 +6,26 @@
 #include <mutex>
 #include "hook.h"
 #include "zygisk.hpp"
-#include "dobby.h" // Pastikan library dobby terhubung
+#include "Includes/Dobby/dobby.h" // PERBAIKAN: Jalur library Dobby disesuaikan dengan folder Anda
 
 using zygisk::Api;
 using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
 // --- STRUKTUR DATA GAME ---
+// PERBAIKAN: Dihapus/dikomentari karena sudah dideklarasikan di file Include/Vector3.h bawaan template Anda
+/*
 struct Vector3 {
     float x, y, z;
 };
+*/
 
 // --- WADAH GLOBAL (Akan dibagikan ke menu ImGui nanti) ---
 void* main_camera = nullptr;
 std::vector<void*> active_players;
 std::mutex player_mutex;
-bool enable_hack = false;
+
+// PERBAIKAN: Variabel enable_hack dihapus dari sini karena tipenya bentrok (bool vs int) dengan extern yang ada di hook.h/hook.cpp
 
 // --- 1. HOOK POSISI (get_Position) ---
 Vector3 (*old_GetPosition)(void *instance);
@@ -59,22 +63,7 @@ void hk_RegisterCustomPlayer(void *instance, void *player_instance) {
 }
 
 // --- MAIN HACK THREAD (Eksekusi Penguncian Offset) ---
-void *hack_thread(void *) {
-    uintptr_t il2cpp_base = 0;
-    
-    // Tunggu sampai library game termuat penuh
-    while (!il2cpp_base) {
-        il2cpp_base = get_module_base("libil2cpp.so"); // Ambil base address
-        sleep(1);
-    }
-
-    // PASANG OFFSET NYATA ANDA DI SINI BOS!
-    DobbyHook((void *)(il2cpp_base + 0x80F07A0), (void *)hk_GetPosition, (void **)&old_GetPosition);
-    DobbyHook((void *)(il2cpp_base + 0x80BFB2C), (void *)hk_WorldToScreenPoint, (void **)&old_WorldToScreenPoint);
-    DobbyHook((void *)(il2cpp_base + 0x7FF17F0), (void *)hk_RegisterCustomPlayer, (void **)&old_RegisterCustomPlayer);
-
-    return nullptr;
-}
+// Catatan: Fungsi hack_thread asli dipindahkan eksekusinya ke hook.cpp agar ImGui dan DobbyHook berjalan sinkron.
 
 // --- STRUKTUR MODUL UTAMA ZYGISK ANDA ---
 class MyModule : public zygisk::ModuleBase {
@@ -87,10 +76,15 @@ public:
         if (!args || !args->nice_name) {
             return;
         }
+        // Menggunakan variabel global int enable_hack yang ditarik dari hook.h/hook.cpp
+        extern int enable_hack;
         enable_hack = isGame(env_, args->app_data_dir); 
     }
 
     void postAppSpecialize(const AppSpecializeArgs *) override {
+        extern int enable_hack;
+        extern void *hack_thread(void *arg); // Memanggil thread utama yang ada di hook.cpp
+        
         if (enable_hack) {
             int ret;
             pthread_t ntid;
