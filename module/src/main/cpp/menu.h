@@ -36,7 +36,7 @@ void DrawESP()
         // Jika bernilai true (1), berarti ini karakter Anda sendiri. Lompati/Jangan digambar!
         if (is_local) continue;
 
-        // Ambil koordinat 3D musuh menggunakan fungsi asli get_Position
+        // PERBAIKAN: Memanggil fungsi old_GetPosition sesuai deklarasi extern baru di functions.h
         Vector3 enemyWorldPos = old_GetPosition(player);
 
         // Wadah kosong untuk menampung hasil konversi koordinat ke layar 2D HP
@@ -45,7 +45,7 @@ void DrawESP()
         // Lempar koordinat 3D tadi ke fungsi kamera game (UGCAPIWorldToScreenPoint)
         old_WorldToScreenPoint(main_camera, enemyWorldPos, 2, &enemyScreenPos);
 
-        // PERBAIKAN: Mengubah koordinat .z .x .y menjadi huruf KAPITAL (.Z .X .Y)
+        // Menggunakan koordinat huruf KAPITAL (.Z .X .Y) sesuai struktur Vector3 template Anda
         if (enemyScreenPos.Z > 0.0f) {
             
             // Tentukan titik awal garis: Tepat di tengah bawah layar HP Anda
