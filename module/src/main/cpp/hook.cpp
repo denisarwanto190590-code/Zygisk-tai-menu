@@ -43,6 +43,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
         return 0;
     const char *app_data_dir = env->GetStringUTFChars(appDataDir, nullptr);
     int user = 0;
+    // FIX: Ukuran penampung nama paket dikembalikan ke ukuran normal (256)
     static char package_name[256];
     if (sscanf(app_data_dir, "/data/%*[^/]/%d/%s", &user, package_name) != 2) {
         if (sscanf(app_data_dir, "/data/%*[^/]/%s", package_name) != 1) {
@@ -65,7 +66,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
 
 bool setupimg;
 
-// --- PERBAIKAN: Deklarasi pointer langsung mengambil extern milik menu.h agar tidak duplikat ---
+// --- Deklarasi pointer langsung mengambil extern milik menu.h agar tidak duplikat ---
 extern EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf); 
 
