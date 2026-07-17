@@ -33,9 +33,12 @@
 #define GamePackageName "com.dts.freefireth" 
 
 int glHeight, glWidth;
-char* game_data_dir = nullptr;
-bool enable_hack = false;
-ProcMap g_il2cppBaseMap;
+bool setupimg;
+
+// Mengambil variabel asli dari hook.h dan Misc.h agar tidak redefinition error
+extern char* game_data_dir;
+extern int enable_hack; 
+extern ProcMap g_il2cppBaseMap;
 
 int isGame(JNIEnv *env, jstring appDataDir)
 {
@@ -43,8 +46,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
         return 0;
     const char *app_data_dir = env->GetStringUTFChars(appDataDir, nullptr);
     int user = 0;
-    // FIXED: Ukuran array [256] sekarang sudah terpasang dengan benar dan tidak akan hilang
-    static char package_name[256];
+    static char package_name[256]; // Array aman dari sscanf crash
     if (sscanf(app_data_dir, "/data/%*[^/]/%d/%s", &user, package_name) != 2) {
         if (sscanf(app_data_dir, "/data/%*[^/]/%s", package_name) != 1) {
             package_name[0] = '\0';
@@ -64,9 +66,7 @@ int isGame(JNIEnv *env, jstring appDataDir)
     }
 }
 
-bool setupimg;
-
-// --- Deklarasi pointer langsung mengambil extern milik menu.h agar tidak duplikat ---
+// --- Deklarasi pointer mengambil extern milik menu.h ---
 extern EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surf);
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surf); 
 
@@ -109,21 +109,17 @@ void *hack_thread(void *arg) {
     uintptr_t il2cpp_base = g_il2cppBaseMap.startAddress;
     KITTY_LOGI("il2cpp base: %p", (void*)il2cpp_base);
     
-    // Inisialisasi Pointer & Patches Bawaan
     Pointers();
     Hooks();
     
-    // [EKSEKUSI UTAMA] Pasang 3 DobbyHook ESP Anda di sini!
     DobbyHook((void *)(il2cpp_base + 0x80F07A0), (void *)hk_GetPosition, (void **)&old_GetPosition);
     DobbyHook((void *)(il2cpp_base + 0x80BFB2C), (void *)hk_WorldToScreenPoint, (void **)&old_WorldToScreenPoint);
     DobbyHook((void *)(il2cpp_base + 0x7FF17F0), (void *)hk_RegisterCustomPlayer, (void **)&old_RegisterCustomPlayer);
 
-    // Kunci Driver Grafik Unity untuk ImGui Menu
     auto eglhandle = dlopen("libunity.so", RTLD_LAZY);
     auto eglSwapBuffers = dlsym(eglhandle, "eglSwapBuffers");
     DobbyHook((void*)eglSwapBuffers, (void*)hook_eglSwapBuffers, (void**)&old_eglSwapBuffers);
     
-    // Kunci Sistem Input Sentuh Layar HP
     void *sym_input = DobbySymbolResolver(("/system/lib/libinput.so"), ("_ZN7android13InputConsumer21initializeMotionEventEPNS_11MotionEventEPKNS_12InputMessageE"));
     if (NULL != sym_input) {
         DobbyHook(sym_input, (void*)myInput, (void**)&origInput);
